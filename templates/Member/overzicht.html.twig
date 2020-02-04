@@ -1,0 +1,14 @@
+{% extends'base.html.twig' %}
+{% block body %}
+    <table class="table">
+ {% for image in image %}
+     <tr>
+     <td>{{ image.name }}</td>
+         <td> {{ image.style }}</td>
+         <td>{{ image.size }}</td>
+         <td>{{ image.color }}</td>
+    <td><img style="width: 150px; height: 200px;"src="{{ image.uri }}"></td>
+     </tr>
+ {% endfor %}
+    </table>
+{% endblock %}

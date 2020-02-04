@@ -40,21 +40,8 @@ class VisitorController extends AbstractController
             /**$var UploadedFile $imageFile*/
             $imageFile = $form->get('image_file_name')->getData();
             if($imageFile) {
-                $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
-                // this is needed to safely include the file name as part of the URL
-                $imagename = $form->get('name')->getData();
-                $imageownername = $this->getUser()->getUsername();
-                $clothing_id = $clothing->getId();
-                $safeFilename = $clothing_id .'-'. $imagename. '-' . $imageownername;
-                $newFilename = $safeFilename.'-'.uniqid().'-'.$imageFile->guessExtension();
-
+                $uri = $clothing->setUri($imageFile);
                 //Move the file to the directory where images are stored
-                try{
-                    $imageFile->move($this->getParameter('outfit_directory'), $newFilename);
-                } catch (FileException $e) {
-                    //handle excetion if something happens during file upload
-                }
-                $clothing->setImageFileName($newFilename);
             }
             $clothing = $form->getData();
             $user = $this->getUser();
@@ -172,6 +159,34 @@ class VisitorController extends AbstractController
      */
     public function testen() {
         return $this->render('Visitor/test.html.twig');
+    }
+
+    /**
+     * @Route("/img_to_uri", name="itu")
+     */
+    public function image() {
+        $em = $this->getDoctrine()->getManager();
+        $foto = $em->getRepository(ClothingPiece::class)->find(8);
+        $f_naam = $foto->getUri();
+
+        return $this->render('Member/test.html.twig', [
+            'image' => $f_naam
+        ]);
+    }
+
+    /**
+     * @Route("/test2", name="test2")
+     */
+    public function test() {
+        $em = $this->getDoctrine()->getManager();
+        $user = $this->getUser()->getId();
+        $foto = $em->getRepository(ClothingPiece::class)->findBy([
+            'user' => $user
+        ]);
+
+        return $this->render('Member/overzicht.html.twig', [
+            'image' => $foto
+        ]);
     }
 
 

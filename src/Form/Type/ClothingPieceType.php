@@ -46,7 +46,8 @@ class ClothingPieceType extends AbstractType
                         'maxSize' => '8Mi',
                         'mimeTypes' => [
                             'image/png',
-                            'image/jpeg'
+                            'image/jpeg',
+                            'image/webp'
                         ],
                         'mimeTypesMessage' => 'Please upload a JPEG or PNG image',
                     ])

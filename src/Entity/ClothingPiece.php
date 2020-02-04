@@ -5,6 +5,8 @@ namespace App\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Normalizer\DataUriNormalizer;
+use Symfony\Component\Serializer\Serializer;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\ClothingPieceRepository")
@@ -33,12 +35,6 @@ class ClothingPiece
      */
     private $Style;
 
-
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $imageFileName;
-
     /**
      * @ORM\Column(type="string", length=255)
      */
@@ -50,9 +46,18 @@ class ClothingPiece
      */
     private $user;
 
+    private $normalizer;
+
+    /**
+     * @ORM\Column(type="string", length=1000000)
+     */
+    private $Uri;
+
     public function __construct()
     {
         $this->userClothingPieces = new ArrayCollection();
+        $this->serializer = new Serializer();
+        $this->normalizer = new DataUriNormalizer();
     }
 
     public function getId(): ?int
@@ -127,18 +132,6 @@ class ClothingPiece
         return $this;
     }
 
-    public function getImageFileName(): ?string
-    {
-        return $this->imageFileName;
-    }
-
-    public function setImageFileName(string $imageFileName): self
-    {
-        $this->imageFileName = $imageFileName;
-
-        return $this;
-    }
-
     public function getName(): ?string
     {
         return $this->name;
@@ -161,5 +154,30 @@ class ClothingPiece
         $this->user = $user;
 
         return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getUri()
+    {
+        return $this->Uri;
+    }
+
+    /**
+     * @param mixed $Uri
+     */
+
+    public function setUri($Uri)
+    {
+        $normalizer = new DataUriNormalizer();
+        $Uri = $normalizer->normalize($Uri);
+        $this->Uri = $Uri;
+        return $this;
+    }
+
+
+    public function uti() {
+
     }
 }
