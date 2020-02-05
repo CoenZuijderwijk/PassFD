@@ -8,8 +8,8 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
 use Symfony\Component\Security\Core\Exception\InvalidCsrfTokenException;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -17,9 +17,10 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Security\Guard\Authenticator\AbstractFormLoginAuthenticator;
+use Symfony\Component\Security\Guard\PasswordAuthenticatedInterface;
 use Symfony\Component\Security\Http\Util\TargetPathTrait;
 
-class UserAuthenticator extends AbstractFormLoginAuthenticator
+class LoginFormAuthenticator extends AbstractFormLoginAuthenticator implements PasswordAuthenticatedInterface
 {
     use TargetPathTrait;
 
@@ -27,15 +28,13 @@ class UserAuthenticator extends AbstractFormLoginAuthenticator
     private $urlGenerator;
     private $csrfTokenManager;
     private $passwordEncoder;
-    private $aci;
 
-    public function __construct(AuthorizationCheckerInterface $aci, EntityManagerInterface $entityManager, UrlGeneratorInterface $urlGenerator, CsrfTokenManagerInterface $csrfTokenManager, UserPasswordEncoderInterface $passwordEncoder)
+    public function __construct(EntityManagerInterface $entityManager, UrlGeneratorInterface $urlGenerator, CsrfTokenManagerInterface $csrfTokenManager, UserPasswordEncoderInterface $passwordEncoder)
     {
         $this->entityManager = $entityManager;
         $this->urlGenerator = $urlGenerator;
         $this->csrfTokenManager = $csrfTokenManager;
         $this->passwordEncoder = $passwordEncoder;
-        $this->aci = $aci;
     }
 
     public function supports(Request $request)
@@ -48,10 +47,9 @@ class UserAuthenticator extends AbstractFormLoginAuthenticator
     {
         $credentials = [
             'username' => $request->request->get('username'),
-            'wachtwoord' => $request->request->get('password'),
+            'password' => $request->request->get('password'),
             'csrf_token' => $request->request->get('_csrf_token'),
         ];
-
         $request->getSession()->set(
             Security::LAST_USERNAME,
             $credentials['username']
@@ -67,12 +65,27 @@ class UserAuthenticator extends AbstractFormLoginAuthenticator
             throw new InvalidCsrfTokenException();
         }
 
-        return $this->entityManager->getRepository(User::class)->findOneBy(['username' => $credentials['username']]);
+        $user = $this->entityManager->getRepository(User::class)->findOneBy(['username' => $credentials['username']]);
+
+        if (!$user) {
+            // fail authentication with a custom error
+            throw new CustomUserMessageAuthenticationException('Username could not be found.');
+        }
+
+        return $user;
     }
 
     public function checkCredentials($credentials, UserInterface $user)
     {
-        return $this->passwordEncoder->isPasswordValid($user, $credentials['wachtwoord']);
+        return $this->passwordEncoder->isPasswordValid($user, $credentials['password']);
+    }
+
+    /**
+     * Used to upgrade (rehash) the user's password automatically over time.
+     */
+    public function getPassword($credentials): ?string
+    {
+        return $credentials['password'];
     }
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)
@@ -80,8 +93,9 @@ class UserAuthenticator extends AbstractFormLoginAuthenticator
         if ($targetPath = $this->getTargetPath($request->getSession(), $providerKey)) {
             return new RedirectResponse($targetPath);
         }
-        $url = "homepage";
-        return new RedirectResponse($this->urlGenerator->generate($url));
+
+         return new RedirectResponse($this->urlGenerator->generate('member_home'));
+
     }
 
     protected function getLoginUrl()
