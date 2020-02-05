@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Serializer\Normalizer\DataUriNormalizer;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
@@ -242,6 +243,8 @@ class User implements UserInterface
 
     public function setFaceImage(?string $face_image): self
     {
+        $normalizer = new DataUriNormalizer();
+        $face_image = $normalizer->normalize($face_image);
         $this->face_image = $face_image;
 
         return $this;
