@@ -30,4 +30,11 @@ class VisitorController extends AbstractController
     public function homepage() {
         return $this->render('visitor/homepage.html.twig');
     }
+
+    /**
+     * @Route("/contact", name="contact")
+     */
+    public function contact() {
+        return $this->render('visitor/contact.html.twig');
+    }
 }
