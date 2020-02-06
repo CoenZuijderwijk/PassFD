@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\ClothingPiece;
 use App\Entity\User;
 use App\Form\Type\UserType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -64,4 +65,26 @@ class AdminController extends AbstractController
             'form' => $form->createView(),
         ]);
     }
+
+    /**
+     * @Route("/overzicht_clothing", name="overzicht_clothing")
+     */
+    public function overzicht_clothing() {
+        $em = $this->getDoctrine()->getManager();
+        $foto = $em->getRepository(ClothingPiece::class)->findAll();
+
+        return $this->render('admin/overzicht_clothing.html.twig', [
+            'images' => $foto
+        ]);}
+
+    /**
+     * @Route("/{id}", name="clothing_show", methods={"GET"})
+     */
+    public function clothing_show(ClothingPiece $clothingPiece): Response
+    {
+        return $this->render('admin/clothing_show.html.twig', [
+            'cl' => $clothingPiece,
+        ]);
+    }
+
 }

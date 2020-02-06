@@ -1,0 +1,32 @@
+{% extends 'admin/nav_bar.html.twig' %}
+
+{% block title %}Clothing{% endblock %}
+
+{% block body %}
+    <h1>Clothing</h1>
+
+    <table class="table">
+        <tbody>
+        <tr>
+            <th>Id</th>
+            <td>{{ cl.id }}</td>
+        </tr>
+        <tr>
+            <th>Size</th>
+            <td>{{ cl.size }}</td>
+        </tr>
+        <tr>
+            <th>Color</th>
+            <td>{{ cl.style }}</td>
+        </tr>
+        <tr>
+            <th>Name</th>
+            <td>{{ cl.name }}</td>
+        </tr>
+        </tbody>
+    </table>
+
+{#    <a href="{{ path('user_edit', {'id': user.id}) }}">edit</a>#}
+
+{#    {{ include('user/_delete_form.html.twig') }}#}
+{% endblock %}

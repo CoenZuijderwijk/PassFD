@@ -45,9 +45,9 @@ class MemberController extends AbstractController
             $em = $this->getDoctrine()->getManager();
             $em->persist($clothing);
             $em->flush();
-            return $this->redirectToRoute('/home');
+            return $this->redirectToRoute('member_home');
         }
-        return $this->render('visitor/clothes_add.html.twig', ['form' => $form->createView(),
+        return $this->render('member/clothes_add.html.twig', ['form' => $form->createView(),
         ]);
 
 
@@ -64,7 +64,7 @@ class MemberController extends AbstractController
         ]);
 
         return $this->render('member/overzicht.html.twig', [
-            'image' => $foto
+            'images' => $foto
         ]);}
 
     /**

@@ -1,0 +1,11 @@
+{% extends 'admin/nav_bar.html.twig' %}
+{% block body %}
+    <div class="row">
+ {% for image in images %}
+    <div class="col-sm-3 col-lg-2">
+    <img style="width: 150px; height: 200px;"src="{{ image.uri }}" onclick="{{ path('clothing_show', {'id': image.id}) }} }}">
+        <a class="btn btn-primary" href="{{ path('clothing_show', {'id': image.id}) }}">show</a>
+    </div>
+ {% endfor %}
+    </div>
+{% endblock %}
