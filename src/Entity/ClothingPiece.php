@@ -49,9 +49,19 @@ class ClothingPiece
     private $normalizer;
 
     /**
-     * @ORM\Column(type="string", length=1000000)
+     * @ORM\Column(type="string", length=100000000)
      */
     private $Uri;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $Type;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $selected;
 
     public function __construct()
     {
@@ -179,5 +189,29 @@ class ClothingPiece
 
     public function uti() {
 
+    }
+
+    public function getType(): ?string
+    {
+        return $this->Type;
+    }
+
+    public function setType(string $Type): self
+    {
+        $this->Type = $Type;
+
+        return $this;
+    }
+
+    public function getSelected(): ?bool
+    {
+        return $this->selected;
+    }
+
+    public function setSelected(?bool $selected): self
+    {
+        $this->selected = $selected;
+
+        return $this;
     }
 }

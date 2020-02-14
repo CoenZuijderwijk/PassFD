@@ -1,6 +1,14 @@
 {% extends 'member/nav_bar.html.twig' %}
 {% block body %}
     <table class="table">
+        <thead>
+        <th>Naam</th>
+        <th>Style</th>
+        <th>Maat</th>
+        <th>Kleur</th>
+        <th></th>
+        <th></th>
+        </thead>
  {% for image in images %}
      <tr>
      <td>{{ image.name }}</td>
@@ -8,6 +16,11 @@
          <td>{{ image.size }}</td>
          <td>{{ image.color }}</td>
     <td><img style="width: 150px; height: 200px;"src="{{ image.uri }}"></td>
+          {% if image.selected != 1 %}
+         <td><a href="{{ path('clothes_select', {id: image.id}) }}"><button class="btn btn-outline-danger">Selecteer</button></a></td>
+         {% else %}
+             <td><a href="{{ path('clothes_select', {id: image.id}) }}"><button class="btn btn-outline-success">Geselecteer</button></a></td>
+             {% endif %}
      </tr>
  {% endfor %}
     </table>

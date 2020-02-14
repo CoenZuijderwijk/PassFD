@@ -62,10 +62,113 @@ class MemberController extends AbstractController
         $foto = $em->getRepository(ClothingPiece::class)->findBy([
             'user' => $user
         ]);
-
         return $this->render('member/overzicht.html.twig', [
             'images' => $foto
-        ]);}
+        ]);
+    }
+
+    /**
+     * @Route("/clothes/{id}", name="overzicht_aangepast")
+     */
+    public function overzichtAangepast($id) {
+        $em = $this->getDoctrine()->getManager();
+        $user = $this->getUser()->getId();
+        $foto = $em->getRepository(ClothingPiece::class)->findBy([
+            'user' => $user,
+            'Type' => $id
+
+        ]);
+        return $this->render('member/overzicht.html.twig', [
+            'images' => $foto
+        ]);
+    }
+
+    /**
+     * @Route("/clothes/select/{id}", name="clothes_select")
+     */
+    public function clothes_select($id) {
+        $em = $this->getDoctrine()->getManager();
+        $cpiece = $em->getRepository(ClothingPiece::class)->find($id);
+        $selected = $cpiece->getSelected();
+        if($selected == false){
+            $cpiece->setSelected(true);
+        } else if($selected == true)
+        {
+            $cpiece->setSelected(false);
+        }
+        $em->persist($cpiece);
+        $em->flush();
+        return $this->redirectToRoute('overzicht');
+    }
+
+    /**
+     * @Route("/outfit", name="outfit")
+     */
+    public function outfit() {
+        $em = $this->getDoctrine()->getManager();
+        $user = $this->getUser()->getId();
+        $clothes = $em->getRepository(ClothingPiece::class)->findBy([
+            'user' => $user,
+            'selected' => true
+        ]);
+        $i = 0;
+        $size = count($clothes);
+        if($size > 2) {
+            //error ofzo?
+        } elseif( $size == 2) {
+            foreach($clothes as $clothes){
+            $type = $clothes->getType();
+            switch ($type) {
+                case 'tshirt' : $bovenstuk = $em->getRepository(ClothingPiece::class)->findBy([
+                    'user' => $user,
+                    'selected' => true,
+                    'Type' => 'tshirt'
+                ]); break;
+                case 'shirt' : $bovenstuk = $em->getRepository(ClothingPiece::class)->findBy([
+                    'user' => $user,
+                    'selected' => true,
+                    'Type' => 'shirt'
+                ]); break;
+                case 'blousse' : $bovenstuk = $em->getRepository(ClothingPiece::class)->findBy([
+                    'user' => $user,
+                    'selected' => true,
+                    'Type' => 'blousse'
+                ]); break;
+                case 'trui': $bovenstuk = $em->getRepository(ClothingPiece::class)->findBy([
+                    'user' => $user,
+                    'selected' => true,
+                    'Type' => 'trui'
+                ]);break;
+                case 'rok': $onderstuk = $em->getRepository(ClothingPiece::class)->findBy([
+                    'user' => $user,
+                    'selected' => true,
+                    'Type' => 'rok']);
+                    break;
+                case 'broek' :$onderstuk = $em->getRepository(ClothingPiece::class)->findBy([
+                    'user' => $user,
+                    'selected' => true,
+                    'Type' => 'broek']);
+                break;
+                default: break;
+            }
+            $i++;
+            }
+        } elseif($clothes == 1){
+            //jurk
+            return $this->render('member/outfit.html.twig', [
+                'jurk' => $clothes,
+            ]);
+        }
+        $clothes = $em->getRepository(ClothingPiece::class)->findBy([
+            'user' => $user,
+            'selected' => true
+        ]);
+        return $this->render('member/outfit.html.twig', [
+            'images' => $clothes,
+            'bovenstuk' => $bovenstuk[0],
+            'onderstuk' => $onderstuk[0]
+        ]);
+    }
 
     /**
      * @Route("/face", name="face")
@@ -104,7 +207,6 @@ class MemberController extends AbstractController
         }
         return $this->render('member/face.html.twig', ['form' => $form->createView(),
         ]);
-
-
     }
+
 }

@@ -4,6 +4,7 @@
 namespace App\Form\Type;
 
 use App\Entity\ClothingPiece;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\AbstractType;
@@ -29,6 +30,18 @@ class ClothingPieceType extends AbstractType
             ->add('size', TextType::class, [
                 'label' => 'size'
             ])
+            ->add('type', ChoiceType::class,
+                [
+                    'choices' => [
+                        'Broek' => 'broek',
+                        'T-shirt' => 'tshirt',
+                        'shirt' => 'shirt',
+                        'blousse' => 'blousse',
+                        'rok' => 'rok',
+                        'jurk' => 'jurk',
+                        'trui' => 'trui'
+                    ]
+                ])
             ->add('image_file_name', FileType::class, [
                 'label' => 'Outfit image',
 
